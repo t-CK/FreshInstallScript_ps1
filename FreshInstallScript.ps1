@@ -21,19 +21,22 @@ function Set-PasswordExpiration {
 
 # Install wmic to system
 function Install-Wmic{
-    $wmic=(Get-WindowsOptionalFeature -Online -FeatureName *wmic*)
-    if($wmic.State -eq "Enabled" -or $wmic.State -eq "Disabled")
+    # If windows edition is Home, install wmic
+    if((Get-WinEdition).Contains("Home"))
     {
-        Write-Host Installing wmic
-        Add-WindowsCapability -Online -Name Wmic
+        Write-Host 'Installing wmic'
+        Add-WindowsCapability -Online -Name wmic
     }
+    # If windows edition has lusrmgr.msc, wmic is not needed
     else
     {
-        Write-Host "wmic cannot be installed"
+        Write-Host (Get-WinEdition)
+        Write-Host 'wmic not needed'
     }
 }
 
 ########## DEBUG ###############
 Write-Host "Manufacturer: " (Get-Manufacturer)
-Write-Host "Model: " (Get-HWInfo)
+Write-Host "Model: " (Get-HWInfo)`n
+Install-Wmic
 ################################
